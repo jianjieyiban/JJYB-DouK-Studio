@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DouK Studio · 多引擎下载控制台</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <img class="brand-mark" src="logo.svg" alt="DouK Studio">
+      <div>
+        <div class="brand-title">DouK Studio</div>
+        <div class="brand-sub">多引擎下载控制台</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item active" data-page="dashboard"><span class="nav-ico">⌂</span> 仪表盘</button>
+      <button class="nav-item" data-page="parse"><span class="nav-ico">⇩</span> 链接解析</button>
+      <div class="nav-label">采集</div>
+      <button class="nav-item" data-page="caption"><span class="nav-ico">✎</span> 文案采集</button>
+      <button class="nav-item" data-page="account"><span class="nav-ico">◎</span> 账号作品</button>
+      <button class="nav-item" data-page="mix"><span class="nav-ico">▤</span> 合集作品</button>
+      <button class="nav-item" data-page="search"><span class="nav-ico">⌕</span> 内容搜索</button>
+      <button class="nav-item" data-page="live"><span class="nav-ico">◉</span> 直播数据</button>
+      <button class="nav-item" data-page="comment"><span class="nav-ico">◍</span> 评论采集</button>
+      <button class="nav-item" data-page="reply"><span class="nav-ico">↳</span> 评论回复</button>
+      <div class="nav-label">管理</div>
+      <button class="nav-item" data-page="downloads"><span class="nav-ico">≡</span> 下载队列 <span class="nav-badge" id="navTaskCount">0</span></button>
+      <button class="nav-item" data-page="files"><span class="nav-ico">▣</span> 文件管理</button>
+      <button class="nav-item" data-page="history"><span class="nav-ico">◷</span> 下载历史</button>
+      <button class="nav-item" data-page="original"><span class="nav-ico">⌘</span> 原工具功能</button>
+      <button class="nav-item" data-page="settings"><span class="nav-ico">⚙</span> 设置</button>
+      <button class="nav-item" data-page="logs"><span class="nav-ico">≋</span> 运行日志</button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="engine-mini">
+        <span class="dot" id="sideDot"></span>
+        <div>
+          <div class="engine-mini-title" id="sideEngineText">检测中...</div>
+          <div class="engine-mini-sub" id="sideApiText">127.0.0.1:5555</div>
+        </div>
+      </div>
+      <div class="side-version">DouK Studio v1.2 · 本地运行</div>
+    </div>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div>
+        <div class="page-kicker" id="pageKicker">OVERVIEW</div>
+        <h1 class="page-title" id="pageTitle">仪表盘</h1>
+      </div>
+      <div class="top-actions">
+        <div class="status-pill" id="statusPill"><span class="dot"></span> DouK 引擎检测中</div>
+        <button class="btn btn-ghost" id="themeBtn" title="切换主题">◐</button>
+        <button class="btn btn-ghost" id="engineStartBtn">启动引擎</button>
+        <button class="btn btn-ghost" id="engineStopBtn">停止</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Dashboard -->
+      <section class="page active" id="page-dashboard">
+        <div class="hero card">
+          <div class="hero-copy">
+            <div class="eyebrow">ONE CONSOLE · TWO ENGINES</div>
+            <h2>把下载这件事，变得简单一点</h2>
+            <p>抖音 / TikTok 用 DouK 原生接口，YouTube / B站等 1000+ 站点交给 yt-dlp。统一队列、统一进度、统一管理。</p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-a"></div>
+            <div class="orbit orbit-b"></div>
+            <div class="orbit-core"><img src="logo.svg" alt=""></div>
+          </div>
+        </div>
+
+        <div class="stat-grid" id="statGrid">
+          <div class="stat card"><div class="stat-label">运行中任务</div><div class="stat-value" id="statRunning">0</div><div class="stat-foot">实时同步</div></div>
+          <div class="stat card"><div class="stat-label">已完成</div><div class="stat-value" id="statDone">0</div><div class="stat-foot">本次会话</div></div>
+          <div class="stat card"><div class="stat-label">下载目录</div><div class="stat-value stat-path" id="statDir">-</div><div class="stat-foot" id="statFiles">0 个文件</div></div>
+          <div class="stat card"><div class="stat-label">引擎状态</div><div class="stat-value stat-small" id="statEngine">检测中</div><div class="stat-foot" id="statTools">-</div></div>
+        </div>
+
+        <div class="card quick-card">
+          <div class="card-head">
+            <div><h3>快速解析</h3><p>粘贴任意视频链接，自动选择最合适的引擎</p></div>
+            <button class="btn btn-link" data-goto="parse">打开完整解析 →</button>
+          </div>
+          <div class="quick-form">
+            <input class="input" id="dashUrl" placeholder="粘贴抖音 / TikTok / YouTube / B站 链接，或分享口令">
+            <button class="btn btn-primary" id="dashParseBtn">解析链接</button>
+          </div>
+          <div class="quick-hint">支持 <b>抖音分享口令</b>、<b>完整视频链接</b>、<b>YouTube / B站 / X 等 yt-dlp 支持站点</b></div>
+          <div id="dashResult" class="result-area"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>最近任务</h3><p>下载队列的最新动态</p></div><button class="btn btn-link" data-goto="downloads">查看全部 →</button></div>
+          <div id="dashTasks" class="mini-task-list"></div>
+        </div>
+      </section>
+
+      <!-- Parse -->
+      <section class="page" id="page-parse">
+        <div class="card">
+          <div class="card-head"><div><h3>链接解析</h3><p>获取作品信息后，可选择视频 / 音频 / 封面加入下载队列</p></div></div>
+          <div class="form-row">
+            <div class="field grow">
+              <label>视频链接或分享口令</label>
+              <input class="input" id="parseUrl" placeholder="https://www.douyin.com/video/... 或 https://www.youtube.com/watch?v=...">
+            </div>
+            <div class="field narrow">
+              <label>解析引擎</label>
+              <select class="input" id="parseEngine">
+                <option value="auto">自动选择</option>
+                <option value="douk">DouK（抖音/TikTok）</option>
+                <option value="ytdlp">yt-dlp（通用站点）</option>
+              </select>
+            </div>
+            <div class="field narrow end"><button class="btn btn-primary" id="parseBtn">解析</button></div>
+          </div>
+          <div class="toolbar">
+            <label class="check"><input type="checkbox" id="selectAllItems" data-scope="parseResult"> 全选结果</label>
+            <button class="btn btn-sm" id="batchVideo" data-batch="video" data-scope="parseResult">下载选中视频</button>
+            <button class="btn btn-sm" id="batchAudio" data-batch="audio" data-scope="parseResult">下载选中音频</button>
+            <span class="toolbar-tip">也可以在单张卡片上单独选择</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>批量解析</h3><p>每行一条链接，最多 10 条；结果会合并到下方列表统一选择下载</p></div></div>
+          <div class="field">
+            <textarea class="input" id="batchUrls" rows="4" placeholder="https://v.douyin.com/xxxx/&#10;https://www.youtube.com/watch?v=...&#10;https://www.bilibili.com/video/..."></textarea>
+          </div>
+          <div class="toolbar"><button class="btn btn-primary" id="batchParseBtn">批量解析</button><span class="toolbar-tip">解析每条链接可能需要数十秒，请耐心等待</span></div>
+        </div>
+        <div id="parseResult" class="result-area"></div>
+      </section>
+
+      <!-- Account -->
+      <section class="page" id="page-account">
+        <div class="card">
+          <div class="card-head"><div><h3>账号作品采集</h3><p>输入 sec_uid 或账号主页链接，批量获取作品</p></div></div>
+          <div class="form-row">
+            <div class="field grow"><label>sec_uid / 主页链接 / 视频链接</label><input class="input" id="accountId" placeholder="sec_uid、博主主页链接，或该博主任意作品链接（自动识别博主）"></div>
+            <div class="field narrow"><label>平台</label><select class="input" id="accountPlatform"><option value="douyin">抖音</option><option value="tiktok">TikTok</option></select></div>
+            <div class="field narrow"><label>标签</label><select class="input" id="accountTab"><option value="post">作品</option><option value="like">喜欢</option><option value="collect">收藏</option></select></div>
+            <div class="field narrow"><label>数量</label><input class="input" id="accountCount" type="number" value="30" min="1"></div>
+            <div class="field narrow end"><button class="btn btn-primary" id="accountBtn">采集</button></div>
+          </div>
+        </div>
+        <div id="accountResult" class="result-area"></div>
+      </section>
+
+      <!-- Mix -->
+      <section class="page" id="page-mix">
+        <div class="card">
+          <div class="card-head"><div><h3>合集作品采集</h3><p>通过合集 ID 或任意一条作品 ID 获取整个合集</p></div></div>
+          <div class="form-row">
+            <div class="field grow"><label>合集 ID / 作品链接或 ID</label><input class="input" id="mixId" placeholder="合集内任意一条作品链接（推荐，自动加载合集）或作品 ID"></div>
+            <div class="field narrow"><label>平台</label><select class="input" id="mixPlatform"><option value="douyin">抖音</option><option value="tiktok">TikTok</option></select></div>
+            <div class="field narrow"><label>数量</label><input class="input" id="mixCount" type="number" value="50" min="1"></div>
+            <div class="field narrow end"><button class="btn btn-primary" id="mixBtn">采集</button></div>
+          </div>
+        </div>
+        <div id="mixResult" class="result-area"></div>
+      </section>
+
+      <!-- Search -->
+      <section class="page" id="page-search">
+        <div class="card">
+          <div class="card-head"><div><h3>内容搜索</h3><p>综合 / 视频 / 用户 / 直播，结果可直接加入下载队列</p></div></div>
+          <div class="tabs" id="searchTabs">
+            <button class="tab active" data-type="general">综合</button>
+            <button class="tab" data-type="video">视频</button>
+            <button class="tab" data-type="user">用户</button>
+            <button class="tab" data-type="live">直播</button>
+          </div>
+          <div class="form-row">
+            <div class="field grow"><label>关键词</label><input class="input" id="searchKeyword" placeholder="输入搜索关键词"></div>
+            <div class="field narrow"><label>页数</label><input class="input" id="searchPages" type="number" value="1" min="1"></div>
+            <div class="field narrow"><label>每页数量</label><input class="input" id="searchCount" type="number" value="20" min="5"></div>
+            <div class="field narrow end"><button class="btn btn-primary" id="searchBtn">搜索</button></div>
+          </div>
+          <div class="form-row advanced" id="searchAdvanced">
+            <div class="field narrow"><label>排序</label><select class="input" id="searchSort"><option value="0">综合</option><option value="1">最新</option><option value="2">最热</option></select></div>
+            <div class="field narrow"><label>发布时间</label><select class="input" id="searchTime"><option value="0">不限</option><option value="1">一天内</option><option value="7">一周内</option><option value="180">半年内</option></select></div>
+            <div class="field narrow"><label>时长</label><select class="input" id="searchDuration"><option value="0">不限</option><option value="1">短</option><option value="2">中</option><option value="3">长</option></select></div>
+          </div>
+        </div>
+        <div id="searchResult" class="result-area"></div>
+      </section>
+
+      <!-- Live -->
+      <section class="page" id="page-live">
+        <div class="card">
+          <div class="card-head"><div><h3>直播数据</h3><p>获取直播间信息与推流地址</p></div></div>
+          <div class="form-row">
+            <div class="field grow"><label>web_rid / room_id</label><input class="input" id="liveId" placeholder="直播间 ID"></div>
+            <div class="field narrow"><label>平台</label><select class="input" id="livePlatform"><option value="douyin">抖音</option><option value="tiktok">TikTok</option></select></div>
+            <div class="field narrow end"><button class="btn btn-primary" id="liveBtn">获取</button></div>
+          </div>
+        </div>
+        <div id="liveResult" class="result-area"></div>
+      </section>
+
+      <!-- Comment -->
+      <section class="page" id="page-comment">
+        <div class="card">
+          <div class="card-head"><div><h3>评论采集</h3><p>获取作品评论与回复数据</p></div></div>
+          <div class="form-row">
+            <div class="field grow"><label>作品 ID</label><input class="input" id="commentId" placeholder="detail_id"></div>
+            <div class="field narrow"><label>页数</label><input class="input" id="commentPages" type="number" value="1" min="1"></div>
+            <div class="field narrow"><label>数量</label><input class="input" id="commentCount" type="number" value="30" min="1"></div>
+            <div class="field narrow"><label>每条回复数</label><input class="input" id="commentReplyCount" type="number" value="3" min="1"></div>
+            <div class="field narrow"><label class="check"><input type="checkbox" id="commentReply"> 包含回复</label></div>
+            <div class="field narrow end"><button class="btn btn-primary" id="commentBtn">采集</button></div>
+          </div>
+        </div>
+        <div id="commentResult" class="result-area"></div>
+      </section>
+
+      <!-- Reply -->
+      <section class="page" id="page-reply">
+        <div class="card">
+          <div class="card-head"><div><h3>评论回复采集</h3><p>输入作品 ID 与评论 ID，获取该评论下的回复</p></div></div>
+          <div class="form-row">
+            <div class="field grow"><label>作品 ID（detail_id）</label><input class="input" id="replyDetailId" placeholder="detail_id"></div>
+            <div class="field grow"><label>评论 ID（comment_id）</label><input class="input" id="replyCommentId" placeholder="comment_id"></div>
+            <div class="field narrow"><label>页数</label><input class="input" id="replyPages" type="number" value="1" min="1"></div>
+            <div class="field narrow"><label>数量</label><input class="input" id="replyCount" type="number" value="10" min="1"></div>
+            <div class="field narrow end"><button class="btn btn-primary" id="replyBtn">采集</button></div>
+          </div>
+        </div>
+        <div id="replyResult" class="result-area"></div>
+      </section>
+
+      <!-- Caption -->
+      <section class="page" id="page-caption">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>文案采集</h3><p>抓取标题文案 + AI 语音识别提取视频解说文案（口播 / 无声字幕）；支持单条、多条、博主主页整包整理导出</p></div>
+            <span class="badge running">TEXT ONLY</span>
+          </div>
+          <div class="tabs" id="captionTabs">
+            <button class="tab active" data-capmode="single">单条链接</button>
+            <button class="tab" data-capmode="batch">多条链接</button>
+            <button class="tab" data-capmode="account">博主主页</button>
+          </div>
+
+          <div class="cap-panel" data-panel="single">
+            <div class="form-row">
+              <div class="field grow"><label>作品链接 / 分享口令</label><input class="input" id="capSingleUrl" placeholder="粘贴抖音 / TikTok 作品链接或分享口令"></div>
+              <div class="field narrow"><label>引擎</label><select class="input" id="capSingleEngine"><option value="auto">自动</option><option value="douk">DouK</option><option value="ytdlp">yt-dlp</option></select></div>
+              <div class="field narrow end"><button class="btn btn-primary" id="capSingleBtn">提取文案</button></div>
+            </div>
+          </div>
+
+          <div class="cap-panel" data-panel="batch" hidden>
+            <div class="field"><label>链接列表（每行一条，最多 10 条）</label><textarea class="input" id="capBatchUrls" rows="4" placeholder="https://v.douyin.com/xxxx/&#10;https://www.douyin.com/video/123456789"></textarea></div>
+            <div class="form-row" style="margin-top:12px">
+              <div class="field narrow"><label>引擎</label><select class="input" id="capBatchEngine"><option value="auto">自动</option><option value="douk">DouK</option><option value="ytdlp">yt-dlp</option></select></div>
+              <div class="field end"><button class="btn btn-primary" id="capBatchBtn">批量提取文案</button></div>
+            </div>
+          </div>
+
+          <div class="cap-panel" data-panel="account" hidden>
+            <div class="form-row">
+              <div class="field grow"><label>sec_uid / 主页链接 / 视频链接</label><input class="input" id="capAccountId" placeholder="sec_uid、博主主页链接，或该博主任意作品链接（自动识别博主）"></div>
+              <div class="field narrow"><label>最多抓取</label><input class="input" id="capAccountCount" type="number" value="100" min="1" max="500"></div>
+              <div class="field narrow end"><button class="btn btn-primary" id="capAccountBtn">抓取主页文案</button></div>
+            </div>
+            <div class="form-row">
+              <div class="field narrow end"><button class="btn" id="capAccountAllBtn">一键抓取并下载 TXT</button></div>
+              <div class="field"><span class="hint">自动读取博主主页作品文案，按发布时间整理为单个 TXT，保存到项目下载目录的「文案导出」文件夹。</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="capResultCard">
+          <div class="card-head">
+            <div><h3>文案列表 <span id="capCount" class="muted">0 条</span></h3><p>可单选 / 多选，勾选后按需导出；导出文件保存在项目内</p></div>
+            <div class="head-tools">
+              <input class="input" id="capFilter" placeholder="筛选文案关键词" style="max-width:200px">
+              <button class="btn btn-sm btn-primary" id="capNarrateBtn" title="下载音轨并用 AI 语音识别提取解说文案（已下载的视频直接复用本地文件，速度更快）">🎙 提取解说文案（AI）</button>
+              <button class="btn btn-sm" id="capSelectAll">全选</button>
+              <button class="btn btn-sm" id="capSelectNone">清空选择</button>
+            </div>
+          </div>
+          <div id="captionList" class="caption-list"></div>
+          <div class="toolbar caption-export-bar">
+            <span class="toolbar-tip" id="capSelTip">已选择 0 条</span>
+            <button class="btn btn-sm" data-capexport="txt">导出 TXT</button>
+            <button class="btn btn-sm" data-capexport="csv">导出 CSV</button>
+            <button class="btn btn-sm" data-capexport="json">导出 JSON</button>
+            <button class="btn btn-sm" data-capexport="md">导出 Markdown</button>
+            <button class="btn btn-sm" id="capCopyBtn">复制选中文案</button>
+            <button class="btn btn-sm" id="capOpenDirBtn">打开导出目录</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Downloads -->
+      <section class="page" id="page-downloads">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>下载队列</h3><p>支持暂停、继续、取消、重试与打开文件</p></div>
+            <div class="filter-group" id="taskFilters">
+              <button class="chip active" data-filter="all">全部</button>
+              <button class="chip" data-filter="running">运行中</button>
+              <button class="chip" data-filter="queued">排队中</button>
+              <button class="chip" data-filter="completed">已完成</button>
+              <button class="chip" data-filter="failed">失败</button>
+            </div>
+          </div>
+          <div class="toolbar" style="margin:10px 0 0">
+            <span class="toolbar-tip">批量清理（运行中/排队中的任务不会被清理）</span>
+            <button class="btn btn-sm" id="clearCompletedBtn">清空已完成</button>
+            <button class="btn btn-sm" id="clearFailedBtn">清空失败</button>
+            <button class="btn btn-sm btn-danger" id="clearAllBtn">清空全部</button>
+          </div>
+          <div id="taskList" class="task-list"></div>
+        </div>
+      </section>
+
+      <!-- Files -->
+      <section class="page" id="page-files">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>文件管理</h3><p id="fileDirLabel">-</p></div>
+            <div class="head-tools">
+              <input class="input" id="fileSearch" placeholder="筛选文件名" style="max-width:220px">
+              <button class="btn" id="openFolderBtn">打开下载目录</button>
+            </div>
+          </div>
+          <div id="fileList" class="file-list"></div>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section class="page" id="page-history">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>下载历史</h3><p>最近 100 条成功记录，点击「定位」可打开文件所在位置</p></div>
+            <button class="btn btn-danger" id="clearHistoryBtn">清空历史</button>
+          </div>
+          <div id="historyList" class="file-list"></div>
+        </div>
+      </section>
+
+      <!-- Original tool -->
+      <section class="page" id="page-original">
+        <div class="card">
+          <div class="card-head"><div><h3>原工具全部功能</h3><p>直接调用 DouK-Downloader V5.7 的原生菜单；涉及配置的操作会自动备份 settings.json</p></div></div>
+          <div class="action-grid" id="originalActions">
+            <button class="btn" data-original="cookie_douyin_clipboard">从剪贴板提取抖音 Cookie</button>
+            <button class="btn" data-original="cookie_douyin_browser">从浏览器提取抖音 Cookie</button>
+            <button class="btn" data-original="cookie_tiktok_clipboard">从剪贴板提取 TikTok Cookie</button>
+            <button class="btn" data-original="cookie_tiktok_browser">从浏览器提取 TikTok Cookie</button>
+            <button class="btn" data-original="terminal">终端交互模式（新窗口）</button>
+            <button class="btn" data-original="monitor">后台监听模式（新窗口）</button>
+            <button class="btn" data-original="webui">原工具 Web UI 模式（新窗口）</button>
+            <button class="btn" data-original="history_disable">禁用作品下载记录</button>
+            <button class="btn" data-original="history_delete">删除作品下载记录</button>
+            <button class="btn" data-original="log_enable">启用运行日志记录</button>
+            <button class="btn" data-original="update_check">检查程序版本更新</button>
+            <button class="btn" data-original="language_toggle">切换原工具界面语言</button>
+          </div>
+          <div class="hint-box">Cookie 提取会读取当前剪贴板内容，执行前请先复制完整 Cookie；浏览器提取需要本机已登录对应平台。删除作品下载记录、切换语言等操作会修改原工具配置，执行前已自动备份到项目内。Web API 模式由顶部「启动引擎」控制；V5.7 的原 Web UI 模式可能仍显示“重构中”，建议使用 DouK Studio 界面。</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>执行输出</h3><p>最近一次原工具菜单操作的控制台输出</p></div></div>
+          <pre class="log-view" id="originalOutput">尚未执行操作</pre>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section class="page" id="page-settings">
+        <div class="card login-card">
+          <div class="card-head">
+            <div><h3>抖音登录</h3><p>登录后 Cookie 会自动用于搜索、评论、合集等采集，可大幅提升成功率</p></div>
+            <span class="login-badge" id="loginBadge">检测中...</span>
+          </div>
+          <div class="login-row">
+            <button class="btn btn-primary" id="qrLoginBtn">一键扫码登录</button>
+            <button class="btn" id="importCookieBtn">读取本机浏览器 Cookie</button>
+            <button class="btn" id="manualCookieBtn">手动粘贴 Cookie</button>
+            <button class="btn" id="validateCookieBtn">验证 Cookie 有效性</button>
+            <button class="btn btn-ghost-danger" id="logoutBtn" hidden>退出登录</button>
+          </div>
+          <div class="login-meta" id="loginMeta">未检测到登录信息</div>
+          <div class="login-meta" id="loginValidation" hidden></div>
+        </div>
+        <div class="settings-grid">
+          <div class="card">
+            <div class="card-head"><div><h3>应用设置</h3><p>这些设置只影响 DouK Studio</p></div></div>
+            <div class="settings-form">
+              <div class="field"><label>下载目录</label><div class="input-with-btn"><input class="input" id="setDownloadDir"><button class="btn btn-sm" id="pickDirBtn" type="button">浏览...</button></div></div>
+              <div class="field"><label>同时下载任务数</label><input class="input" id="setConcurrent" type="number" min="1" max="10"></div>
+              <div class="field"><label>yt-dlp 路径（留空自动检测）</label><input class="input" id="setYtdlp"></div>
+              <div class="field"><label>FFmpeg 路径（留空自动检测）</label><input class="input" id="setFfmpeg"></div>
+              <div class="field"><label>默认画质 / 格式串</label><input class="input" id="setQuality" placeholder="bestvideo+bestaudio/best"></div>
+              <div class="field"><label>音频格式</label><select class="input" id="setAudioFormat"><option>mp3</option><option>m4a</option><option>flac</option><option>opus</option><option>wav</option></select></div>
+              <div class="field"><label>字幕语言</label><input class="input" id="setSubLangs" placeholder="zh-Hans,zh-CN,en"></div>
+              <div class="field"><label>Cookie 文件（Netscape 格式，可选）</label><input class="input" id="setCookieFile"></div>
+              <div class="field"><label>代理</label><input class="input" id="setProxy" placeholder="http://127.0.0.1:7890"></div>
+              <div class="field"><label>文件名模板</label><input class="input" id="setTemplate" placeholder="{title} [{id}]"></div>
+              <div class="switch-row">
+                <label class="check"><input type="checkbox" id="setWriteSubs"> 下载字幕</label>
+                <label class="check"><input type="checkbox" id="setEmbedSubs"> 嵌入字幕</label>
+                <label class="check"><input type="checkbox" id="setThumb"> 同时下载封面</label>
+                <label class="check"><input type="checkbox" id="setAutoStart"> 启动时自动开启引擎</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><h3>原工具配置</h3><p>修改前会自动备份 settings.json</p></div></div>
+            <div class="settings-form">
+              <div class="field"><label>保存根目录（root）</label><input class="input" id="origRoot" placeholder="留空使用项目目录"></div>
+              <div class="field"><label>子文件夹名</label><input class="input" id="origFolderName"></div>
+              <div class="field"><label>命名格式</label><input class="input" id="origNameFormat"></div>
+              <div class="field"><label>描述长度</label><input class="input" id="origDescLength" type="number"></div>
+              <div class="field"><label>分块大小（字节）</label><input class="input" id="origChunk" type="number"></div>
+              <div class="field"><label>超时（秒）</label><input class="input" id="origTimeout" type="number"></div>
+              <div class="field"><label>最大重试</label><input class="input" id="origRetry" type="number"></div>
+              <div class="field"><label>文件名长度上限</label><input class="input" id="origNameLength" type="number"></div>
+              <div class="field"><label>描述截断长度</label><input class="input" id="origTruncate" type="number"></div>
+              <div class="field"><label>时间格式</label><input class="input" id="origDateFormat" placeholder="%Y-%m-%d %H:%M:%S"></div>
+              <div class="field"><label>名称分隔符</label><input class="input" id="origSplit" placeholder="-"></div>
+              <div class="field"><label>存储格式（留空默认）</label><input class="input" id="origStorageFormat"></div>
+              <div class="field"><label>单文件上限（字节，0 不限）</label><input class="input" id="origMaxSize" type="number"></div>
+              <div class="field"><label>最大采集页数（0 不限）</label><input class="input" id="origMaxPages" type="number"></div>
+              <div class="field"><label>直播画质</label><input class="input" id="origLiveQualities"></div>
+              <div class="field"><label>TikTok 代理</label><input class="input" id="origProxyTiktok"></div>
+              <div class="field"><label>TikTok twc</label><input class="input" id="origTwcTiktok"></div>
+              <div class="field"><label>下载后执行命令（高级）</label><input class="input" id="origRunCommand"></div>
+              <div class="field"><label>抖音 Cookie（留空不修改，格式 key=value; ...）</label><textarea class="input" id="origCookie" rows="3" placeholder="sessionid=...; odin_tt=..."></textarea></div>
+              <div class="field"><label>TikTok Cookie（留空不修改）</label><textarea class="input" id="origCookieTiktok" rows="2" placeholder="tt_csrf_token=...; ..."></textarea></div>
+              <div class="switch-row">
+                <label class="check"><input type="checkbox" id="origFolderMode"> 每个作品单独文件夹</label>
+                <label class="check"><input type="checkbox" id="origDownload"> 下载文件</label>
+                <label class="check"><input type="checkbox" id="origDynamic"> 动态封面</label>
+                <label class="check"><input type="checkbox" id="origStatic"> 静态封面</label>
+                <label class="check"><input type="checkbox" id="origMusic"> 同时下载音乐</label>
+                <label class="check"><input type="checkbox" id="origDouyinPlatform"> 启用抖音平台</label>
+                <label class="check"><input type="checkbox" id="origTiktokPlatform"> 启用 TikTok 平台</label>
+              </div>
+              <div class="cookie-note" id="cookieNote">Cookie 状态检测中...</div>
+            </div>
+          </div>
+        </div>
+        <div class="save-bar"><button class="btn btn-primary" id="saveSettingsBtn">保存设置</button></div>
+      </section>
+
+      <!-- Logs -->
+      <section class="page" id="page-logs">
+        <div class="card">
+          <div class="card-head"><div><h3>运行日志</h3><p>最近 200 条记录</p></div><button class="btn" id="refreshLogsBtn">刷新</button></div>
+          <pre class="log-view" id="logView">加载中...</pre>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="loginQrModal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h3>一键扫码登录抖音</h3><button class="modal-close" data-close-modal="loginQrModal" title="关闭">×</button></div>
+    <div class="modal-body">
+      <p class="modal-tip">登录是<b>可选</b>的：不登录也能正常解析、下载视频和账号作品。登录只用于提升搜索、评论回复等受风控限制功能的成功率，按需使用即可。</p>
+      <ol class="login-steps">
+        <li>点击「打开登录窗口」，会弹出一个浏览器窗口并进入抖音登录页</li>
+        <li>用 <b>抖音 App</b> 扫描页面上的二维码，并在手机上确认登录</li>
+        <li>登录成功后 Cookie 自动保存并同步到引擎，浏览器窗口随后自动关闭</li>
+        <li>登录信息保存在本机（DouK-Studio/data），不会上传到任何服务器</li>
+      </ol>
+      <div class="login-status" id="qrStatus">尚未开始</div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="qrStartBtn">打开登录窗口</button>
+        <button class="btn" data-close-modal="loginQrModal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="loginCookieModal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h3>手动粘贴抖音 Cookie</h3><button class="modal-close" data-close-modal="loginCookieModal" title="关闭">×</button></div>
+    <div class="modal-body">
+      <p class="modal-tip">在电脑浏览器登录 <b>douyin.com</b> 后：按 F12 → 网络(Network) → 刷新页面 → 任意请求 → 复制请求头里的完整 <b>Cookie</b> 值，粘贴到下面。</p>
+      <textarea class="input" id="manualCookieInput" rows="6" placeholder="sessionid=...; ttwid=...; odin_tt=...（必须包含 sessionid）"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="manualCookieSave">保存 Cookie</button>
+        <button class="btn" data-close-modal="loginCookieModal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toastHost" class="toast-host"></div>
+<script src="app.js"></script>
+</body>
+</html>
